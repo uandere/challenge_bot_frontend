@@ -1,9 +1,13 @@
 import './App.css';
 import * as fcl from "@onflow/fcl"; // Import Flow Client Library
-import './config/fclConfig'; // Import Flow configuration
-// import SignInButton from "./SignInButton.tsx";
+import './config/fclConfig';
+import {useEffect} from "react"; // Import Flow configuration
 
 function App() {
+    useEffect(() => {
+        fcl.authenticate().catch(console.error);
+    }, []);
+
     const onClick = async () => {
         try {
             const txId = await fcl.mutate({
@@ -26,7 +30,9 @@ function App() {
 
             const transaction = await fcl.tx(txId).onceSealed();
             console.log("Success!");
+            console.log("Transaction");
             console.log(transaction);
+            console.log(`Transaction ID: ${txId}`);
         } catch (error) {
             console.error("Error while executing transaction: ", error);
         }
@@ -35,7 +41,6 @@ function App() {
     return (
         <div className="App">
             <header className="App-header">
-                {/*<SignInButton/>*/}
                 <button onClick={onClick}>Send Transaction!</button>
             </header>
         </div>

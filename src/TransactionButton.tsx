@@ -1,6 +1,6 @@
 import './App.css';
 import * as fcl from "@onflow/fcl"; // Import Flow Client Library
-import './config/fclConfig';
+import './config/fclConfig.js';
 import {useEffect, useState} from "react";
 
 function TransactionButton() {

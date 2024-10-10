@@ -37,6 +37,7 @@ function TransactionButton() {
             console.log(`Transaction ID: ${txId}`);
             setTransaction({ sealed: true, id: txId });
         } catch (error) {
+            setTransaction({ sealed: false, id: "Transaction failed" });
             console.error("Error while executing transaction: ", error);
         }
     };

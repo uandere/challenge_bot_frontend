@@ -18,6 +18,7 @@ const fclConfigInfo = {
 };
 
 const network = "testnet";
+const WALLET_CONNECT_PROJECT_ID = "e3624d56cc1e2e09d8955265c4238290";
 
 fcl.config({
     "app.detail.title": "Test DApp", // the name of your DApp
@@ -25,7 +26,8 @@ fcl.config({
     "flow.network": network,
     "accessNode.api": fclConfigInfo[network].accessNode,
     "discovery.wallet": fclConfigInfo[network].discoveryWallet,
-    "discovery.authn.endpoint": fclConfigInfo[network].discoveryAuthnEndpoint
+    "discovery.authn.endpoint": fclConfigInfo[network].discoveryAuthnEndpoint,
+    "walletconnect.projectId": WALLET_CONNECT_PROJECT_ID
 });
 
 
@@ -33,21 +35,20 @@ fcl.config({
 // you must get a wallet connect project id:
 // https://cloud.walletconnect.com/sign-in
 
-const WALLET_CONNECT_PROJECT_ID = "e3624d56cc1e2e09d8955265c4238290";
-if (network === "testnet" || network === "mainnet") {
-    init({
-        projectId: WALLET_CONNECT_PROJECT_ID,
-        metadata: {
-            name: "Emerald Academy",
-            description: "The best Flow blockchain educational resource of all time.",
-            url: "https://challengebot-7f5b7.web.app/",
-            icons: ["https://academy.ecdao.org/favicon.png"]
-        },
-        includeBaseWC: true, // makes WalletConnect show up itself
-        wallets: [], // no idea, just leave empty
-        wcRequestHook: null, // literally 0 idea, just leave null
-        pairingModalOverride: null // ???????
-    }).then(({ FclWcServicePlugin }) => {
-        fcl.pluginRegistry.add(FclWcServicePlugin);
-    });
-}
+// if (network === "testnet" || network === "mainnet") {
+//     init({
+//         projectId: WALLET_CONNECT_PROJECT_ID,
+//         metadata: {
+//             name: "Challenge bot",
+//             description: "Up for a challenge?",
+//             url: "https://challengebot-7f5b7.web.app/",
+//             icons: ["https://academy.ecdao.org/favicon.png"]
+//         },
+//         includeBaseWC: true, // makes WalletConnect show up itself
+//         wallets: [], // no idea, just leave empty
+//         wcRequestHook: null, // literally 0 idea, just leave null
+//         pairingModalOverride: null // ???????
+//     }).then(({ FclWcServicePlugin }) => {
+//         fcl.pluginRegistry.add(FclWcServicePlugin);
+//     });
+// }

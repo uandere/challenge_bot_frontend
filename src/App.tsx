@@ -1,50 +1,25 @@
-import './App.css';
-import * as fcl from "@onflow/fcl"; // Import Flow Client Library
-import './config/fclConfig';
-import {useEffect} from "react"; // Import Flow configuration
+import * as fcl from "@onflow/fcl";
 
-function App() {
+import { useEffect, useState } from "react";
+import TransactionButton from "./TransactionButton.tsx";
+
+
+export default function App() {
+    const [user, setUser] = useState({ loggedIn: false, addr: "" });
+
+    // So that the user stays logged in
+    // even if the page refreshes
     useEffect(() => {
-        fcl.authenticate().catch(console.error);
+        fcl.currentUser.subscribe(setUser);
     }, []);
-
-    const onClick = async () => {
-        try {
-            const txId = await fcl.mutate({
-                cadence: `
-                    import HelloWorld from 0x3ee81941ffd1eee8
-    
-                    transaction {
-                      prepare(acct: &Account) {}
-                    
-                      execute {
-                        log(HelloWorld.hello())
-                      }
-                    }
-              `,
-                args: () => [],
-                proposer: fcl.currentUser, // optional - default is fcl.authz
-                payer: fcl.currentUser, // optional - default is fcl.authz
-                authorizations: [fcl.currentUser]
-            });
-
-            const transaction = await fcl.tx(txId).onceSealed();
-            console.log("Success!");
-            console.log("Transaction");
-            console.log(transaction);
-            console.log(`Transaction ID: ${txId}`);
-        } catch (error) {
-            console.error("Error while executing transaction: ", error);
-        }
-    };
 
     return (
         <div className="App">
-            <header className="App-header">
-                <button onClick={onClick}>Send Transaction!</button>
-            </header>
+            <button onClick={fcl.authenticate}>Log In</button>
+            <button onClick={fcl.unauthenticate}>Log Out</button>
+            <p>{user.loggedIn ? `Welcome, ${user.addr}!` : "Please log in."}</p>
+
+            <TransactionButton />
         </div>
     );
 }
-
-export default App;

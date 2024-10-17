@@ -1,14 +1,12 @@
-import * as fcl from "@onflow/fcl";
-
 import { useEffect, useState } from "react";
-import TransactionButton from "./TransactionButton.tsx";
-
+import * as fcl from "@onflow/fcl";
+import AccountLinkingButton from "./AccountLinkingButton";
+import TransactionButton from "./TransactionButton";
 
 export default function App() {
     const [user, setUser] = useState({ loggedIn: false, addr: "" });
 
-    // So that the user stays logged in
-    // even if the page refreshes
+    // Keep user logged in even after page refresh
     useEffect(() => {
         fcl.currentUser.subscribe(setUser);
     }, []);
@@ -19,7 +17,11 @@ export default function App() {
             <button onClick={fcl.unauthenticate}>Log Out</button>
             <p>{user.loggedIn ? `Welcome, ${user.addr}!` : "Please log in."}</p>
 
-            <TransactionButton />
+            {/* Account Linking Button */}
+            {user.loggedIn && <AccountLinkingButton />}
+
+            {/* Transaction Button */}
+            {user.loggedIn && <TransactionButton />}
         </div>
     );
 }

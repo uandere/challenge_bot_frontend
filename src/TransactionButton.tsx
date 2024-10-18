@@ -3,7 +3,7 @@ import * as fcl from "@onflow/fcl"; // Import Flow Client Library
 import './config/fclConfig.js';
 import {useEffect, useState} from "react";
 
-function TransactionButton() {
+export default function TransactionButton() {
     useEffect(() => {
         fcl.authenticate().catch(console.error);
     }, []);
@@ -12,16 +12,22 @@ function TransactionButton() {
 
     const onClick = async () => {
         try {
+            const currentUserAddress = (await fcl.currentUser().snapshot()).addr;
+
             const txId = await fcl.mutate({
                 cadence: `
                     import HelloWorld from 0x3ee81941ffd1eee8
     
                     transaction {
-                      prepare(acct: &Account) {}
+                    
+                      prepare(acct: &Account) {
+                        
+                      }
                     
                       execute {
                         log(HelloWorld.hello())
                       }
+                      
                     }
               `,
                 args: () => [],
@@ -50,5 +56,3 @@ function TransactionButton() {
         </div>
     );
 }
-
-export default TransactionButton;

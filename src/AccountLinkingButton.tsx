@@ -12,13 +12,12 @@ fetch("challenge_bot.pkey")
     .then((res) => res.text())
     .then((text) => {
         privateKey = text;
-        console.log(text);
     })
     .catch((e) => console.error(e));
 
 
 
-// Define the hash function using SHA3
+
 const hashMsgHex = (msgHex: string) => {
     const sha = new SHA3(256)
     sha.update(Buffer.from(msgHex, "hex"))
@@ -36,24 +35,20 @@ function produceSignature(msgHex: string) {
 
 
 const signingFunction = ({
-                             message, // The encoded string which needs to be used to produce the signature.
-                             addr, // The address of the Flow Account this signature is to be produced for.
-                             keyId, // The keyId of the key which is to be used to produce the signature.
+                             message,
+                             addr,
+                             keyId,
                              roles: {
-                                 proposer, // A Boolean representing if this signature to be produced for a proposer.
-                                 authorizer, // A Boolean representing if this signature to be produced for a authorizer.
-                                 payer, // A Boolean representing if this signature to be produced for a payer.
+                                 proposer,
+                                 authorizer,
+                                 payer,
                              },
-                             voucher, // The raw transactions information, can be used to create the message for additional safety and lack of trust in the supplied message.
+                             voucher,
                          }) => {
-    console.log("Message");
-    console.log(message);
-    console.log("Signature");
-    console.log(produceSignature(message));
     return {
-        addr, // The address of the Flow Account this signature was produced for.
-        keyId, // The keyId for which key was used to produce the signature.
-        signature: produceSignature(message), // The hex encoded string representing the signature of the message.
+        addr,
+        keyId,
+        signature: produceSignature(message),
     };
 };
 
@@ -61,30 +56,24 @@ const authorizationFunction = async (account) => {
     const ADDRESS = "0xcc31d33a54094cb3";
     const KEY_ID = 0;
 
-
-    console.log(account);
-
-
     const acc = {
-        ...account, // bunch of defaults in here, we want to overload some of them though
-        addr: ADDRESS, // the address of the signatory
-        keyId: Number(KEY_ID), // this is the keyId for the accounts registered key that will be used to sign, make extra sure this is a number and not a string
+        ...account,
+        addr: ADDRESS,
+        keyId: Number(KEY_ID),
         signingFunction
     };
 
-    console.log(acc);
-
-    // authorization function need to return an account
     return {
-        ...account, // bunch of defaults in here, we want to overload some of them though
-        addr: ADDRESS, // the address of the signatory
-        keyId: Number(KEY_ID), // this is the keyId for the accounts registered key that will be used to sign, make extra sure this is a number and not a string
+        ...account,
+        addr: ADDRESS,
+        keyId: Number(KEY_ID),
         signingFunction
     }
 }
 
 export default function AccountLinkingButton() {
     const [message, setMessage] = useState("");
+
 
     const linkAccount = async () => {
         try {
@@ -114,13 +103,15 @@ export default function AccountLinkingButton() {
             const sendLinkTxStatus = await fcl.tx(sendLinkTxId).onceSealed();
             console.log(sendLinkTxStatus);
 
+            const currentUserAddress = (await fcl.currentUser().snapshot()).addr;
+
             const receiveLinkTxId = await fcl.mutate({
                 cadence: `
                     transaction {
                         prepare(signer: auth(ClaimInboxCapability) &Account) {
                             let capabilityName = "accountCapA"
-                            let providerAddress = 0xcc31d33a54094cb3
-                            // Claim the capability published by the account cc31d33a54094cb3
+                            let providerAddress:Address = ${currentUserAddress}
+                            // Claim the capability published by the web app account
                             let capability = signer.inbox
                                 .claim<auth(Storage, Contracts, Keys, Inbox, Capabilities) &Account>(
                                     capabilityName,
@@ -140,8 +131,6 @@ export default function AccountLinkingButton() {
                 payer: authorizationFunction,
                 authorizations: [authorizationFunction]
             });
-
-            console.log("HERE");
 
             const receiveLinkTxStatus = await fcl.tx(receiveLinkTxId).onceSealed();
             console.log(receiveLinkTxStatus);

@@ -27,4 +27,4 @@ imports
 *.sln
 *.sw?
 
-challenge_bot.pkey
+#challenge_bot.pkey

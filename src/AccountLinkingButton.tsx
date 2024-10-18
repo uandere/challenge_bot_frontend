@@ -52,20 +52,22 @@ const signingFunction = ({
     };
 };
 
-const authorizationFunction = async (account) => {
-    const ADDRESS = "0xcc31d33a54094cb3";
+export const WEB_APP_ADDRESS = "0xcc31d33a54094cb3";
+
+export const authorizationFunction = async (account) => {
+
     const KEY_ID = 0;
 
     const acc = {
         ...account,
-        addr: ADDRESS,
+        addr: WEB_APP_ADDRESS,
         keyId: Number(KEY_ID),
         signingFunction
     };
 
     return {
         ...account,
-        addr: ADDRESS,
+        addr: WEB_APP_ADDRESS,
         keyId: Number(KEY_ID),
         signingFunction
     }

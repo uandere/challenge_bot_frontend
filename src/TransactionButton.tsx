@@ -20,48 +20,38 @@ export default function TransactionButton() {
 
             const txId = await fcl.mutate({
                 cadence: `
-                    import FlowToken from ${FlowAddress}
                     import FungibleToken from ${FungibleToken}
+                    import FlowToken from ${FlowAddress}
                     
     
                     transaction(amount: UFix64, to: Address) {
                         // The Vault resource that holds the tokens that are being transferred
-                        let sentVault: @FungibleToken.Vault
+                        let sentVault: @{FungibleToken.Vault}
                     
-                        prepare (signer: &Account) {
-                            // Get a reference to the signer's stored vault
-                            let account = getAccount(${currentUserAddress})
+                        prepare (signer: auth(Capabilities, LoadValue) &Account) {
                             
-                            let capability = signer.inbox
-                                .claim<auth(Storage, Contracts, Keys, Inbox, Capabilities) &Account>(
-                                    capabilityName,
-                                    provider: providerAddress
-                                ) ?? panic(
-                                    "Capability with name ".concat(capabilityName)
-                                    .concat(" from provider ").concat(providerAddress.toString())
-                                    .concat(" not found")
-                                )
-                            // Simply borrowing an Account reference here for demonstration purposes
-                            let accountRef = capability.borrow()!
+                            let capability = signer.storage.load<Capability<auth(Storage, Contracts, Keys, Inbox, Capabilities) &Account>>(from: StoragePath(identifier: "${currentUserAddress}")!)!
                             
-                            let vaultRef = capability.storage.borrow<auth(FlowToken.Withdraw) &FlowToken.Vault>(from: /storage/flowTokenVault)
+                            let vaultRef = capability.borrow()!.storage.borrow<auth(FungibleToken.Withdraw) &FlowToken.Vault>(from: /storage/flowTokenVault)!
+                            
+                            // let vaultRef = capability.borrow<auth(FungibleToken.Withdraw) &FlowToken.Vault>(/storage/flowTokenVault)!
 
-                            // Withdraw tokens from the signer's stored vault
-                            self.sentVault <- vaultRef.withdraw(amount: amount)
+                            self.sentVault <- vaultRef.withdraw(amount: amount)                      
                         }
                         
                         execute {
+                            
                             // Get a reference to the recipient's Receiver
-                            let receiverRef =  getAccount(to)
-                                .getCapability(/public/flowTokenReceiver)
-                                .borrow<&{FungibleToken.Receiver}>() 
+                            let receiverRef = getAccount(to)
+                                .capabilities
+                                .borrow<&{FungibleToken.Receiver}>(/public/flowTokenReceiver) 
                                 ?? panic("Could not borrow receiver reference to the recipient's Vault")
                     
                             // Deposit the withdrawn tokens in the recipient's receiver
                             receiverRef.deposit(from: <-self.sentVault)
                         }
                     }
-              `,
+                `,
                 args: (arg, t) => [
                     arg(0.5, t.UFix64),
                     arg(WEB_APP_ADDRESS, t.Address),

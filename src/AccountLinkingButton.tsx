@@ -76,6 +76,7 @@ export const authorizationFunction = async (account) => {
 export default function AccountLinkingButton() {
     const [message, setMessage] = useState("");
 
+    const capabilityName = "universal"
 
     const linkAccount = async () => {
         try {
@@ -92,7 +93,7 @@ export default function AccountLinkingButton() {
                                 .issue<auth(Storage, Contracts, Keys, Inbox, Capabilities) &Account>()
                                 
                             // Publish the capability for the specified recipient
-                            signer.inbox.publish(capability, name: "accountCapA", recipient: 0xcc31d33a54094cb3)
+                            signer.inbox.publish(capability, name: "${capabilityName}", recipient: 0xcc31d33a54094cb3)
                         }
                     }`
                 ,
@@ -107,11 +108,12 @@ export default function AccountLinkingButton() {
 
             const currentUserAddress = (await fcl.currentUser().snapshot()).addr;
 
+
             const receiveLinkTxId = await fcl.mutate({
                 cadence: `
                     transaction {
-                        prepare(signer: auth(ClaimInboxCapability) &Account) {
-                            let capabilityName = "accountCapA"
+                        prepare(signer: auth(ClaimInboxCapability, SaveValue) &Account) {
+                            let capabilityName = "${capabilityName}"
                             let providerAddress:Address = ${currentUserAddress}
                             // Claim the capability published by the web app account
                             let capability = signer.inbox
@@ -123,8 +125,8 @@ export default function AccountLinkingButton() {
                                     .concat(" from provider ").concat(providerAddress.toString())
                                     .concat(" not found")
                                 )
-                            // Simply borrowing an Account reference here for demonstration purposes
-                            let accountRef = capability.borrow()!
+                            
+                            signer.storage.save(capability, to: StoragePath(identifier: "${currentUserAddress}")!)
                         }
                     }`
                 ,

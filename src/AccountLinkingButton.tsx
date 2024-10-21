@@ -125,8 +125,10 @@ export default function AccountLinkingButton() {
                                     .concat(" from provider ").concat(providerAddress.toString())
                                     .concat(" not found")
                                 )
-                            
-                            signer.storage.save(capability, to: StoragePath(identifier: "${currentUserAddress}")!)
+                                
+                            if signer.storage.type(at: StoragePath(identifier: "${currentUserAddress}")!) == nil {
+                                signer.storage.save(capability, to: StoragePath(identifier: "${currentUserAddress}")!)
+                            }
                         }
                     }`
                 ,

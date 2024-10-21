@@ -30,12 +30,10 @@ export default function TransactionButton() {
                     
                         prepare (signer: auth(Capabilities, LoadValue) &Account) {
                             
-                            let capability = signer.storage.load<Capability<auth(Storage, Contracts, Keys, Inbox, Capabilities) &Account>>(from: StoragePath(identifier: "${currentUserAddress}")!)!
+                            let capability = signer.storage.copy<Capability<auth(Storage, Contracts, Keys, Inbox, Capabilities) &Account>>(from: StoragePath(identifier: "${currentUserAddress}")!)!
                             
                             let vaultRef = capability.borrow()!.storage.borrow<auth(FungibleToken.Withdraw) &FlowToken.Vault>(from: /storage/flowTokenVault)!
                             
-                            // let vaultRef = capability.borrow<auth(FungibleToken.Withdraw) &FlowToken.Vault>(/storage/flowTokenVault)!
-
                             self.sentVault <- vaultRef.withdraw(amount: amount)                      
                         }
                         

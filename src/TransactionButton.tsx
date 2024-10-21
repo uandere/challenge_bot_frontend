@@ -28,7 +28,7 @@ export default function TransactionButton() {
                         // The Vault resource that holds the tokens that are being transferred
                         let sentVault: @{FungibleToken.Vault}
                     
-                        prepare (signer: auth(Capabilities, LoadValue) &Account) {
+                        prepare (signer: auth(Capabilities, CopyValue) &Account) {
                             
                             let capability = signer.storage.copy<Capability<auth(Storage, Contracts, Keys, Inbox, Capabilities) &Account>>(from: StoragePath(identifier: "${currentUserAddress}")!)!
                             

@@ -6,14 +6,14 @@ import {Buffer} from 'buffer';
 
 const ec: EC = new EC("p256");
 
-let privateKey = "";
+let privateKey = "29554319ca67eb3f1398629dc3df525a384d31dabe82ba70bca4d95ae78b58ad";
 
-fetch("challenge_bot.pkey")
-    .then((res) => res.text())
-    .then((text) => {
-        privateKey = text;
-    })
-    .catch((e) => console.error(e));
+// fetch("challenge_bot.pkey")
+//     .then((res) => res.text())
+//     .then((text) => {
+//         privateKey = text;
+//     })
+//     .catch((e) => console.error(e));
 
 
 
